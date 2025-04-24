@@ -1,4 +1,4 @@
-package br.com.weconcept.challenge.service
+package br.com.weconcept.challenge.application.service
 
 import org.springframework.stereotype.Service
 
