@@ -1,17 +1,17 @@
 package br.com.weconcept.challenge.infrastructure.web.controller
 
-import br.com.weconcept.challenge.service.AppService
+import br.com.weconcept.challenge.application.service.AppService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("")
+@RequestMapping
 class AppController(
     private val appService: AppService
 ) {
 
-    @GetMapping("")
+    @GetMapping
     fun getHello(): String = this.appService.getHello()
 
 }
