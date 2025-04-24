@@ -1,0 +1,12 @@
+FROM postgres:16.8
+
+ENV POSTGRES_DB=weconcept
+ENV POSTGRES_USER=developer
+ENV POSTGRES_PASSWORD=1357924680
+ENV PGDATA=/var/lib/postgresql/data/pgdata
+
+EXPOSE 5432
+
+COPY ./init.sql /docker-entrypoint-initdb.d/
+
+RUN chmod -R 0700 /var/lib/postgresql/data && chown -R postgres:postgres /var/lib/postgresql/data
