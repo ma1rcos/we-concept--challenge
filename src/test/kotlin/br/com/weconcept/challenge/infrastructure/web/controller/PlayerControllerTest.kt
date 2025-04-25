@@ -3,6 +3,7 @@ package br.com.weconcept.challenge.infrastructure.web.controller
 import br.com.weconcept.challenge.application.service.PlayerService
 import br.com.weconcept.challenge.domain.model.Player
 import br.com.weconcept.challenge.infrastructure.web.dto.request.CreatePlayerRequest
+import br.com.weconcept.challenge.infrastructure.web.dto.request.UpdatePlayerRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import io.mockk.mockk
@@ -95,6 +96,31 @@ class PlayerControllerTest {
 
         mockMvc.perform(get("/player").param("name", "Test Player"))
             .andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `should update player`() {
+        val request = UpdatePlayerRequest(name = "Updated Name")
+        every { playerService.getById(1L) } returns Player(
+            id = 1L,
+            name = "Test Player",
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now()
+        )
+        every { playerService.update(any()) } returns Player(
+            id = 1L,
+            name = "Updated Name",
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now()
+        )
+        mockMvc.perform(
+            put("/player/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.name").value("Updated Name"))
     }
 
     @TestConfiguration

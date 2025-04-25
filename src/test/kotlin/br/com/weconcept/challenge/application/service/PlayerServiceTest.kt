@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 class PlayerServiceTest {
 
@@ -58,6 +59,16 @@ class PlayerServiceTest {
         val result = playerService.getByName("Test Player")
         assertNull(result)
         verify { playerRepositoryPort.findByName("Test Player") }
+    }
+
+    @Test
+    fun `should update player`() {
+        val existingPlayer = Player(id = 1L, name = "Old Name")
+        val updatedPlayer = existingPlayer.copy(name = "New Name", updatedAt = LocalDateTime.now())
+        every { playerRepositoryPort.update(updatedPlayer) } returns updatedPlayer
+        val result = playerService.update(updatedPlayer)
+        assertEquals(1L, result.id)
+        assertEquals("New Name", result.name)
     }
 
 }

@@ -11,4 +11,5 @@ class PlayerService(
     fun create(player: Player): Player = playerRepositoryPort.save(player)
     fun getById(id: Long): Player? = playerRepositoryPort.findById(id)
     fun getByName(name: String): Player? = playerRepositoryPort.findByName(name)
+    fun update(player: Player): Player = playerRepositoryPort.update(player)
 }

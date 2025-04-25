@@ -2,7 +2,7 @@ package br.com.weconcept.challenge.infrastructure.web.mapper
 
 import br.com.weconcept.challenge.domain.model.Player
 import br.com.weconcept.challenge.infrastructure.web.dto.request.CreatePlayerRequest
-import br.com.weconcept.challenge.infrastructure.web.dto.response.CreatePlayerResponse
+import br.com.weconcept.challenge.infrastructure.web.dto.response.PlayerResponse
 
 object PlayerMapper {
 
@@ -12,8 +12,8 @@ object PlayerMapper {
         )
     }
 
-    fun toResponse(player: Player): CreatePlayerResponse {
-        return CreatePlayerResponse(
+    fun toResponse(player: Player): PlayerResponse {
+        return PlayerResponse(
             id = player.id,
             name = player.name,
             createdAt = player.createdAt,
