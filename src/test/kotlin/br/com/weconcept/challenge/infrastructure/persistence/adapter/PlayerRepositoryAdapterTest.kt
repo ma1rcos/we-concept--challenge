@@ -86,5 +86,12 @@ class PlayerRepositoryAdapterTest {
             playerJpaRepository.save(any())
         }
     }
+
+    @Test
+    fun `should delete player by id`() {
+        every { playerJpaRepository.deleteById(1L) } returns Unit
+        playerRepositoryAdapter.deleteById(1L)
+        verify { playerJpaRepository.deleteById(1L) }
+    }
     
 }

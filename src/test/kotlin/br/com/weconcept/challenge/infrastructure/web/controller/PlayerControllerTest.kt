@@ -123,6 +123,13 @@ class PlayerControllerTest {
             .andExpect(jsonPath("$.name").value("Updated Name"))
     }
 
+    @Test
+    fun `should delete player`() {
+        every { playerService.deleteById(1L) } returns Unit
+        mockMvc.perform(delete("/player/1"))
+            .andExpect(status().isNoContent)
+    }
+
     @TestConfiguration
     class Config {
         @Bean

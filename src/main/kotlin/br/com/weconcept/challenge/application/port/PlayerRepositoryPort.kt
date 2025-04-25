@@ -7,4 +7,5 @@ interface PlayerRepositoryPort {
     fun findById(id: Long): Player?
     fun findByName(name: String): Player?
     fun update(player: Player): Player
+    fun deleteById(id: Long)
 }

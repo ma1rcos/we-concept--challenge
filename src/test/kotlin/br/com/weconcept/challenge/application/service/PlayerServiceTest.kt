@@ -71,4 +71,11 @@ class PlayerServiceTest {
         assertEquals("New Name", result.name)
     }
 
+    @Test
+    fun `should delete player by id`() {
+        every { playerRepositoryPort.deleteById(1L) } returns Unit
+        playerService.deleteById(1L)
+        verify { playerRepositoryPort.deleteById(1L) }
+    }
+
 }

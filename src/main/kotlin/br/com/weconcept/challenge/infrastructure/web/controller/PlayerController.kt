@@ -43,4 +43,10 @@ class PlayerController(
         return PlayerMapper.toResponse(result)
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteById(@PathVariable id: Long) {
+        playerService.deleteById(id)
+    }
+
 }
