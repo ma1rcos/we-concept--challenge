@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 class PlayerRepositoryAdapter(
     private val playerJpaRepository: PlayerJpaRepository
 ) : PlayerRepositoryPort {
-
     override fun save(player: Player): Player = playerJpaRepository.save(player)
-
+    override fun findById(id: Long): Player? = playerJpaRepository.findById(id).orElse(null)
+    override fun findByName(name: String): Player? = playerJpaRepository.findByName(name)
 }

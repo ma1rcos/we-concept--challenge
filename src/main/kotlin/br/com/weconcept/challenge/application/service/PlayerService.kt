@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service
 class PlayerService(
     private val playerRepositoryPort: PlayerRepositoryPort
 ) {
-
-    fun createPlayer(player: Player): Player {
-        return playerRepositoryPort.save(player)
-    }
-
+    fun create(player: Player): Player = playerRepositoryPort.save(player)
+    fun getById(id: Long): Player? = playerRepositoryPort.findById(id)
+    fun getByName(name: String): Player? = playerRepositoryPort.findByName(name)
 }
