@@ -26,4 +26,20 @@ class TournamentServiceTest {
         verify { tournamentRepository.save(tournament) }
     }
 
+    @Test
+    fun `should add player to tournament`() {
+        val player = Player(id = 1L, name = "Test Player")
+        val tournament = Tournament(id = 1L, name = "Test Tournament", date = LocalDate.now())
+        every { playerRepository.findById(1L) } returns player
+        every { tournamentRepository.addPlayer(1L, player) } returns tournament.copy(
+            players = mutableSetOf(player)
+        )
+        val result = tournamentService.addPlayer(1L, 1L)
+        assertEquals(1, result.players.size)
+        verify { 
+            playerRepository.findById(1L)
+            tournamentRepository.addPlayer(1L, player)
+        }
+    }
+
 }
