@@ -12,4 +12,5 @@ class TournamentService(
     private val playerRepository: PlayerRepositoryPort
 ) {
     fun create(tournament: Tournament): Tournament = tournamentRepository.save(tournament)
+    fun findById(id: Long): Tournament? = tournamentRepository.findById(id)
 }

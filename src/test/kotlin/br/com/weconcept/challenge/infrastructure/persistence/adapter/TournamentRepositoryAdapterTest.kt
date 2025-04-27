@@ -27,4 +27,20 @@ class TournamentRepositoryAdapterTest {
         verify { tournamentJpaRepository.save(tournament) }
     }
 
+    @Test
+    fun `should find tournament by id`() {
+        val tournament = Tournament(id = 1L, name = "Test Tournament", date = LocalDate.now())
+        every { tournamentJpaRepository.findById(1L) } returns Optional.of(tournament)
+        val result = tournamentRepositoryAdapter.findById(1L)
+        assertEquals(1L, result?.id)
+        assertEquals("Test Tournament", result?.name)
+    }
+
+    @Test
+    fun `should return null when tournament not found`() {
+        every { tournamentJpaRepository.findById(1L) } returns Optional.empty()
+        val result = tournamentRepositoryAdapter.findById(1L)
+        assertNull(result)
+    }
+
 }

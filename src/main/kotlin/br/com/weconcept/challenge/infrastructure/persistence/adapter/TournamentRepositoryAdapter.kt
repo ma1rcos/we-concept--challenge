@@ -10,6 +10,6 @@ import org.springframework.stereotype.Component
 class TournamentRepositoryAdapter(
     private val tournamentJpaRepository: TournamentJpaRepository
 ) : TournamentRepositoryPort {
-    override fun save(tournament: Tournament): Tournament =
-        tournamentJpaRepository.save(tournament)
+    override fun save(tournament: Tournament): Tournament = tournamentJpaRepository.save(tournament)
+    override fun findById(id: Long): Tournament? = tournamentJpaRepository.findById(id).orElse(null)
 }
