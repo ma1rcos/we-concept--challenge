@@ -8,4 +8,5 @@ interface TournamentRepositoryPort {
     fun findById(id: Long): Tournament?
     fun addPlayer(tournamentId: Long, player: Player): Tournament
     fun removePlayer(tournamentId: Long, playerId: Long): Tournament
+    fun finishTournament(tournamentId: Long): Tournament
 }

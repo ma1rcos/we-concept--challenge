@@ -115,5 +115,37 @@ class TournamentRepositoryAdapterTest {
         }
     }
 
+    @Test
+    fun `should finish tournament successfully`() {
+        val tournament = Tournament(
+            id = 1L,
+            name = "Test Tournament",
+            date = LocalDate.now()
+        )
+        val finishedTournament = tournament.copy(isFinished = true)
+        every { tournamentJpaRepository.findById(1L) } returns Optional.of(tournament)
+        every { tournamentJpaRepository.save(any()) } returns finishedTournament
+        val result = tournamentRepositoryAdapter.finishTournament(1L)
+        assertTrue(result.isFinished)
+        verify { 
+            tournamentJpaRepository.findById(1L)
+            tournamentJpaRepository.save(any())
+        }
+    }
+
+    @Test
+    fun `should throw when finishing already finished tournament`() {
+        val tournament = Tournament(
+            id = 1L,
+            name = "Test Tournament",
+            date = LocalDate.now(),
+            isFinished = true
+        )
+        every { tournamentJpaRepository.findById(1L) } returns Optional.of(tournament)
+        assertThrows<IllegalStateException> {
+            tournamentRepositoryAdapter.finishTournament(1L)
+        }
+    }
+
 
 }

@@ -32,4 +32,15 @@ class TournamentRepositoryAdapter(
         tournament.players.remove(player)
         return tournamentJpaRepository.save(tournament)
     }
+    override fun finishTournament(tournamentId: Long): Tournament {
+        val tournament = tournamentJpaRepository.findById(tournamentId)
+            .orElseThrow { IllegalArgumentException("Tournament not found") }
+        
+        if (tournament.isFinished) {
+            throw IllegalStateException("Tournament already finished")
+        }
+        
+        tournament.isFinished = true
+        return tournamentJpaRepository.save(tournament)
+    }
 }

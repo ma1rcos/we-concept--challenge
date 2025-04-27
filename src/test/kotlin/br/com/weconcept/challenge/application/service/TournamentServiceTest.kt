@@ -51,4 +51,15 @@ class TournamentServiceTest {
         verify { tournamentRepository.removePlayer(1L, 1L) }
     }
 
+    @Test
+    fun `should finish tournament`() {
+        val tournament = Tournament(id = 1L, name = "Test Tournament", date = LocalDate.now())
+        every { tournamentRepository.finishTournament(1L) } returns tournament.copy(
+            isFinished = true
+        )
+        val result = tournamentService.finishTournament(1L)
+        assertTrue(result.isFinished)
+        verify { tournamentRepository.finishTournament(1L) }
+    }
+
 }

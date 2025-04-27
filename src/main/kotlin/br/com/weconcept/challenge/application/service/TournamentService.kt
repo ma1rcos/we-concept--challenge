@@ -14,6 +14,7 @@ class TournamentService(
     fun create(tournament: Tournament): Tournament = tournamentRepository.save(tournament)
     fun findById(id: Long): Tournament? = tournamentRepository.findById(id)
     fun removePlayer(tournamentId: Long, playerId: Long): Tournament = tournamentRepository.removePlayer(tournamentId, playerId)
+    fun finishTournament(tournamentId: Long): Tournament = tournamentRepository.finishTournament(tournamentId)
     fun addPlayer(tournamentId: Long, playerId: Long): Tournament {
         val player = playerRepository.findById(playerId) 
             ?: throw IllegalArgumentException("Player not found")

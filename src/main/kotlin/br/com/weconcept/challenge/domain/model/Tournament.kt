@@ -10,7 +10,7 @@ data class Tournament(
     val id: Long = 0,
     val name: String,
     val date: LocalDate,
-    val isFinished: Boolean = false,
+    var isFinished: Boolean = false,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now(),
     @ManyToMany

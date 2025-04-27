@@ -39,4 +39,10 @@ class TournamentController(
         return TournamentMapper.toResponse(tournament)
     }
 
+    @PostMapping("/{tournamentId}/finish")
+    fun finishTournament(@PathVariable tournamentId: Long): TournamentResponse {
+        val tournament = tournamentService.finishTournament(tournamentId)
+        return TournamentMapper.toResponse(tournament)
+    }
+
 }

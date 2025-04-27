@@ -88,6 +88,24 @@ class TournamentControllerTest {
             .andExpect(jsonPath("$.players.length()").value(0))
     }
 
+    @Test
+    fun `should finish tournament successfully`() {
+        val tournament = Tournament(
+            id = 1L,
+            name = "Test Tournament",
+            date = LocalDate.now(),
+            isFinished = true
+        )
+        
+        every { tournamentService.finishTournament(1L) } returns tournament
+        
+        mockMvc.perform(
+            post("/tournament/1/finish")
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.isFinished").value(true))
+    }
+
     @TestConfiguration
     class Config {
         @Bean
