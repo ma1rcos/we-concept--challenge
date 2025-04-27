@@ -15,10 +15,19 @@ class TournamentController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun createTournament(@RequestBody request: CreateTournamentRequest): TournamentResponse {
+    fun create(@RequestBody request: CreateTournamentRequest): TournamentResponse {
         val tournament = TournamentMapper.toDomain(request)
         val createdTournament = tournamentService.create(tournament)
         return TournamentMapper.toResponse(createdTournament)
+    }
+
+    @PostMapping("/{tournamentId}/player/{playerId}")
+    fun addPlayer(
+        @PathVariable tournamentId: Long,
+        @PathVariable playerId: Long
+    ): TournamentResponse {
+        val tournament = tournamentService.addPlayer(tournamentId, playerId)
+        return TournamentMapper.toResponse(tournament)
     }
 
 }

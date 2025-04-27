@@ -43,4 +43,41 @@ class TournamentRepositoryAdapterTest {
         assertNull(result)
     }
 
+    @Test
+    fun `should add player to tournament successfully`() {
+        val player = Player(id = 1L, name = "Test Player")
+        val tournament = Tournament(
+            id = 1L,
+            name = "Test Tournament",
+            date = LocalDate.now(),
+            players = mutableSetOf()
+        )
+        val updatedTournament = tournament.copy(players = mutableSetOf(player))
+        every { tournamentJpaRepository.findById(1L) } returns Optional.of(tournament)
+        every { tournamentJpaRepository.save(any()) } returns updatedTournament
+        val result = tournamentRepositoryAdapter.addPlayer(1L, player)
+        assertEquals(1, result.players.size)
+        assertTrue(result.players.contains(player))
+        verify { 
+            tournamentJpaRepository.findById(1L)
+            tournamentJpaRepository.save(any())
+        }
+    }
+
+    @Test
+    fun `should throw when adding player to finished tournament`() {
+        val player = Player(id = 1L, name = "Test Player")
+        val tournament = Tournament(
+            id = 1L,
+            name = "Test Tournament",
+            date = LocalDate.now(),
+            isFinished = true
+        )
+        every { tournamentJpaRepository.findById(1L) } returns Optional.of(tournament)
+        assertThrows<IllegalStateException> {
+            tournamentRepositoryAdapter.addPlayer(1L, player)
+        }
+    }
+
+
 }
