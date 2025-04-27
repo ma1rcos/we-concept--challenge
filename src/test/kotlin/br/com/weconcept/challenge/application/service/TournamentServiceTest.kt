@@ -62,4 +62,19 @@ class TournamentServiceTest {
         verify { tournamentRepository.finishTournament(1L) }
     }
 
+    @Test
+    fun `should list players from tournament`() {
+        val player = Player(id = 1L, name = "Test Player")
+        val tournament = Tournament(
+            id = 1L, 
+            name = "Test Tournament", 
+            date = LocalDate.now(),
+            players = mutableSetOf(player))
+        
+        every { tournamentRepository.findById(1L) } returns tournament
+        val result = tournamentService.listPlayers(1L)
+        assertEquals(1, result.size)
+        assertEquals("Test Player", result.first().name)
+    }
+
 }

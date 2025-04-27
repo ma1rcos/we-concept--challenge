@@ -20,4 +20,8 @@ class TournamentService(
             ?: throw IllegalArgumentException("Player not found")
         return tournamentRepository.addPlayer(tournamentId, player)
     }
+    fun listPlayers(tournamentId: Long): Set<Player> {
+        return tournamentRepository.findById(tournamentId)?.players 
+            ?: throw IllegalArgumentException("Tournament not found")
+    }
 }

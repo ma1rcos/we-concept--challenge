@@ -2,6 +2,7 @@ package br.com.weconcept.challenge.infrastructure.web.controller
 
 import br.com.weconcept.challenge.application.service.TournamentService
 import br.com.weconcept.challenge.infrastructure.web.dto.request.CreateTournamentRequest
+import br.com.weconcept.challenge.infrastructure.web.dto.response.PlayerResponse
 import br.com.weconcept.challenge.infrastructure.web.dto.response.TournamentResponse
 import br.com.weconcept.challenge.infrastructure.web.mapper.TournamentMapper
 import org.springframework.http.HttpStatus
@@ -44,5 +45,19 @@ class TournamentController(
         val tournament = tournamentService.finishTournament(tournamentId)
         return TournamentMapper.toResponse(tournament)
     }
+
+    @GetMapping("/{tournamentId}/player")
+    fun listPlayers(@PathVariable tournamentId: Long): List<PlayerResponse> {
+        return tournamentService.listPlayers(tournamentId)
+            .map { player ->
+                PlayerResponse(
+                    id = player.id,
+                    name = player.name,
+                    createdAt = player.createdAt,
+                    updatedAt = player.updatedAt
+                )
+            }
+    }
+
 
 }

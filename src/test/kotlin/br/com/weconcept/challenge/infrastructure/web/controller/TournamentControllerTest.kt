@@ -106,6 +106,25 @@ class TournamentControllerTest {
             .andExpect(jsonPath("$.isFinished").value(true))
     }
 
+    @Test
+    fun `should list players from tournament successfully`() {
+        val player = Player(id = 1L, name = "Test Player")
+        val tournament = Tournament(
+            id = 1L,
+            name = "Test Tournament",
+            date = LocalDate.now(),
+            players = mutableSetOf(player)
+        )
+        every { tournamentService.listPlayers(1L) } returns setOf(player)   
+        mockMvc.perform(
+            get("/tournament/1/player")
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].id").value(1))
+            .andExpect(jsonPath("$[0].name").value("Test Player"))
+    }
+
     @TestConfiguration
     class Config {
         @Bean
