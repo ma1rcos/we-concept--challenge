@@ -21,4 +21,15 @@ class TournamentRepositoryAdapter(
         tournament.players.add(player)
         return tournamentJpaRepository.save(tournament)
     }
+    override fun removePlayer(tournamentId: Long, playerId: Long): Tournament {
+        val tournament = tournamentJpaRepository.findById(tournamentId)
+            .orElseThrow { IllegalArgumentException("Tournament not found") }
+        if (tournament.isFinished) {
+            throw IllegalStateException("Tournament already finished")
+        }
+        val player = tournament.players.find { it.id == playerId }
+            ?: throw IllegalArgumentException("Player not found in tournament")
+        tournament.players.remove(player)
+        return tournamentJpaRepository.save(tournament)
+    }
 }

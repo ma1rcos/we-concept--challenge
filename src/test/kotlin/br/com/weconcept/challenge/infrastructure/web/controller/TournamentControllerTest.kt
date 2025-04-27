@@ -72,6 +72,22 @@ class TournamentControllerTest {
             .andExpect(jsonPath("$.players[0].id").value(1))
     }
 
+    @Test
+    fun `should remove player from tournament successfully`() {
+        val tournament = Tournament(
+            id = 1L,
+            name = "Test Tournament",
+            date = LocalDate.now(),
+            players = mutableSetOf()
+        )
+        every { tournamentService.removePlayer(1L, 1L) } returns tournament
+        mockMvc.perform(
+            delete("/tournament/1/player/1")
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.players.length()").value(0))
+    }
+
     @TestConfiguration
     class Config {
         @Bean

@@ -30,4 +30,13 @@ class TournamentController(
         return TournamentMapper.toResponse(tournament)
     }
 
+    @DeleteMapping("/{tournamentId}/player/{playerId}")
+    fun removePlayer(
+        @PathVariable tournamentId: Long,
+        @PathVariable playerId: Long
+    ): TournamentResponse {
+        val tournament = tournamentService.removePlayer(tournamentId, playerId)
+        return TournamentMapper.toResponse(tournament)
+    }
+
 }

@@ -79,5 +79,41 @@ class TournamentRepositoryAdapterTest {
         }
     }
 
+    @Test
+    fun `should remove player from tournament successfully`() {
+        val player = Player(id = 1L, name = "Test Player")
+        val tournament = Tournament(
+            id = 1L,
+            name = "Test Tournament",
+            date = LocalDate.now(),
+            players = mutableSetOf(player)
+        )
+        val updatedTournament = tournament.copy(players = mutableSetOf())
+        every { tournamentJpaRepository.findById(1L) } returns Optional.of(tournament)
+        every { tournamentJpaRepository.save(any()) } returns updatedTournament
+        val result = tournamentRepositoryAdapter.removePlayer(1L, 1L)
+        assertEquals(0, result.players.size)
+        verify { 
+            tournamentJpaRepository.findById(1L)
+            tournamentJpaRepository.save(any())
+        }
+    }
+
+    @Test
+    fun `should throw when removing player from finished tournament`() {
+        val player = Player(id = 1L, name = "Test Player")
+        val tournament = Tournament(
+            id = 1L,
+            name = "Test Tournament",
+            date = LocalDate.now(),
+            isFinished = true,
+            players = mutableSetOf(player)
+        )
+        every { tournamentJpaRepository.findById(1L) } returns Optional.of(tournament)
+        assertThrows<IllegalStateException> {
+            tournamentRepositoryAdapter.removePlayer(1L, 1L)
+        }
+    }
+
 
 }

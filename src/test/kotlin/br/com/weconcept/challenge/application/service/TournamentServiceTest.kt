@@ -42,4 +42,13 @@ class TournamentServiceTest {
         }
     }
 
+    @Test
+    fun `should remove player from tournament`() {
+        val tournament = Tournament(id = 1L, name = "Test Tournament", date = LocalDate.now())
+        every { tournamentRepository.removePlayer(1L, 1L) } returns tournament
+        val result = tournamentService.removePlayer(1L, 1L)
+        assertEquals(1L, result.id)
+        verify { tournamentRepository.removePlayer(1L, 1L) }
+    }
+
 }
