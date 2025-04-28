@@ -91,23 +91,103 @@ class PlayerController(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
     }
 
+    @Operation(
+        summary = "Get player by name",
+        description = "Retrieves a player by their exact name (case sensitive)"
+    )
+    @ApiResponses(value = [
+        ApiResponse(
+            responseCode = "200",
+            description = "Player found",
+            content = [Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = PlayerResponse::class),
+                examples = [ExampleObject(value = """
+                    {
+                        "id": 1,
+                        "name": "John Doe",
+                        "createdAt": "2023-01-01T12:00:00",
+                        "updatedAt": "2023-01-01T12:00:00"
+                    }
+                """)]
+            )]
+        ),
+        ApiResponse(responseCode = "404", description = "Player not found")
+    ])
     @GetMapping
-    fun getByName(@RequestParam name: String): PlayerResponse {
+    fun getByName(
+        @Parameter(
+            description = "Exact name of the player to search for",
+            example = "John Doe",
+            required = true
+        )
+        @RequestParam name: String
+    ): PlayerResponse {
         return playerService.getByName(name)?.let { PlayerMapper.toResponse(it) }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
     }
 
+    @Operation(
+        summary = "Update player information",
+        description = "Updates the name of an existing player"
+    )
+    @ApiResponses(value = [
+        ApiResponse(
+            responseCode = "200",
+            description = "Player updated successfully",
+            content = [Content(
+                mediaType = "application/json",
+                schema = Schema(implementation = PlayerResponse::class),
+                examples = [ExampleObject(value = """
+                    {
+                        "id": 1,
+                        "name": "Updated Name",
+                        "createdAt": "2023-01-01T12:00:00",
+                        "updatedAt": "2023-01-15T14:30:00"
+                    }
+                """)]
+            )]
+        ),
+        ApiResponse(responseCode = "400", description = "Invalid input data"),
+        ApiResponse(responseCode = "404", description = "Player not found")
+    ])
     @PutMapping("/{id}")
-    fun update(@PathVariable id: Long, @RequestBody request: UpdatePlayerRequest): PlayerResponse {
+    fun update(
+        @Parameter(description = "ID of the player to update", example = "1")
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "New player name",
+            content = [Content(
+                mediaType = "application/json",
+                examples = [ExampleObject(value = """
+                    {
+                        "name": "Updated Name"
+                    }
+                """)]
+            )]
+        )
+        @PathVariable id: Long,
+        @RequestBody request: UpdatePlayerRequest
+    ): PlayerResponse {
         val existingPlayer = playerService.getById(id) ?: throw IllegalArgumentException("Player not found")
         val updatedPlayer = existingPlayer.copy(name = request.name)
         val result = playerService.update(updatedPlayer)
         return PlayerMapper.toResponse(result)
     }
 
+    @Operation(
+        summary = "Delete a player",
+        description = "Permanently removes a player from the system"
+    )
+    @ApiResponses(value = [
+        ApiResponse(responseCode = "204", description = "Player deleted successfully"),
+        ApiResponse(responseCode = "404", description = "Player not found")
+    ])
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteById(@PathVariable id: Long) {
+    fun deleteById(
+        @Parameter(description = "ID of the player to delete", example = "1")
+        @PathVariable id: Long
+    ) {
         playerService.deleteById(id)
     }
 
