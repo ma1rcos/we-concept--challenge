@@ -6,6 +6,7 @@ import br.com.weconcept.challenge.infrastructure.web.dto.request.UpdatePlayerReq
 import br.com.weconcept.challenge.infrastructure.web.dto.response.PlayerResponse
 import br.com.weconcept.challenge.infrastructure.web.mapper.PlayerMapper
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
@@ -69,8 +70,23 @@ class PlayerController(
         return PlayerMapper.toResponse(createdPlayer)
     }
 
+    @Operation(
+        summary = "Get player by ID",
+        description = "Retrieves player details by their unique identifier"
+    )
+    @ApiResponses(value = [
+        ApiResponse(
+            responseCode = "200",
+            description = "Player found",
+            content = [Content(schema = Schema(implementation = PlayerResponse::class))]
+        ),
+        ApiResponse(responseCode = "404", description = "Player not found")
+    ])
     @GetMapping("/{id}")
-    fun getById(@PathVariable id: Long): PlayerResponse {
+    fun getById(
+        @Parameter(description = "ID of the player to retrieve", example = "1")
+        @PathVariable id: Long
+    ): PlayerResponse {
         return playerService.getById(id)?.let { PlayerMapper.toResponse(it) }
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
     }
