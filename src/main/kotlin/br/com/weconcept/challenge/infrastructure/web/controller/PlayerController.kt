@@ -50,7 +50,20 @@ class PlayerController(
     ])
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@RequestBody request: CreatePlayerRequest): PlayerResponse {
+    fun create(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Player creation data",
+            content = [Content(
+                mediaType = "application/json",
+                examples = [ExampleObject(value = """
+                    {
+                        "name": "John Doe"
+                    }
+                """)]
+            )]
+        )
+        @RequestBody request: CreatePlayerRequest
+    ): PlayerResponse {
         val player = PlayerMapper.toDomain(request)
         val createdPlayer = playerService.create(player)
         return PlayerMapper.toResponse(createdPlayer)
