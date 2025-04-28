@@ -24,6 +24,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+	implementation("org.springdoc:springdoc-openapi-starter-common:2.2.0")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("io.mockk:mockk:1.13.5")
