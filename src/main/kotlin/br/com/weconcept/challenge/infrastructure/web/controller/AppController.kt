@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RestController
 class AppController(
     private val appService: AppService
 ) {
-
     @GetMapping
     fun getHello(): String = this.appService.getHello()
-
 }

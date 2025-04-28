@@ -21,5 +21,12 @@ data class Tournament(
     )
     val players: MutableSet<Player> = mutableSetOf()
 ) {
-    constructor() : this(0, "", LocalDate.now(), false, LocalDateTime.now(), LocalDateTime.now())
+    constructor() : this(
+        0,
+        "",
+        LocalDate.now(),
+        false,
+        LocalDateTime.now(),
+        LocalDateTime.now()
+    )
 }
