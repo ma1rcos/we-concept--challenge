@@ -13,8 +13,22 @@ class AppController(
 ) {
 
     @Operation(
-        summary = "Get Hello",
-        description = "Returns a 'hello, world!'"
+        summary = "Retrieve a friendly greeting",
+        description = "Returns a simple 'hello, world!' message to confirm the application is running."
+    )
+    @io.swagger.v3.oas.annotations.responses.ApiResponses(
+        value = [
+            io.swagger.v3.oas.annotations.responses.ApiResponse(
+                responseCode = "200",
+                description = "Greeting returned successfully",
+                content = [io.swagger.v3.oas.annotations.media.Content(
+                    mediaType = "text/plain",
+                    examples = [io.swagger.v3.oas.annotations.media.ExampleObject(
+                        value = "hello, world!"
+                    )]
+                )]
+            )
+        ]
     )
     @GetMapping
     fun getHello(): String = this.appService.getHello()

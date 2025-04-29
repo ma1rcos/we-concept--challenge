@@ -6,7 +6,6 @@ import br.com.weconcept.challenge.infrastructure.web.dto.response.PlayerResponse
 import br.com.weconcept.challenge.infrastructure.web.dto.response.TournamentResponse
 import br.com.weconcept.challenge.infrastructure.web.mapper.TournamentMapper
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -15,7 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
-@Tag(name = "Tournament", description = "Operations related to tournaments management")
+@Tag(name = "Tournament", description = "Operations for managing tournaments.")
 @RestController
 @RequestMapping("/tournament")
 class TournamentController(
@@ -24,16 +23,15 @@ class TournamentController(
 
     @Operation(
         summary = "Create a new tournament",
-        description = "Creates a new tournament with the given name and date"
+        description = "Creates a new tournament with the specified details."
     )
     @ApiResponses(value = [
         ApiResponse(
             responseCode = "201",
-            description = "Tournament created successfully",
+            description = "Tournament created successfully.",
             content = [Content(
                 mediaType = "application/json",
-                examples = [ExampleObject(
-                    value = """
+                examples = [ExampleObject(value = """
                     {
                         "id": 1,
                         "name": "Spring Challenge",
@@ -41,17 +39,16 @@ class TournamentController(
                         "isFinished": false,
                         "players": []
                     }
-                """
-                )]
+                """)]
             )]
         ),
-        ApiResponse(responseCode = "400", description = "Invalid input")
+        ApiResponse(responseCode = "400", description = "Invalid input provided.")
     ])
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun create(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Tournament creation request",
+            description = "Details of the tournament to be created.",
             content = [Content(
                 mediaType = "application/json",
                 examples = [ExampleObject(value = """
@@ -70,17 +67,16 @@ class TournamentController(
     }
 
     @Operation(
-        summary = "Add player to tournament",
-        description = "Adds an existing player to the specified tournament"
+        summary = "Add a player to a tournament",
+        description = "Associates an existing player with a specified tournament."
     )
     @ApiResponses(value = [
         ApiResponse(
             responseCode = "200",
-            description = "Player added successfully",
+            description = "Player added successfully.",
             content = [Content(
                 mediaType = "application/json",
-                examples = [ExampleObject(
-                    value = """
+                examples = [ExampleObject(value = """
                     {
                         "id": 1,
                         "name": "Spring Challenge",
@@ -95,26 +91,15 @@ class TournamentController(
                             }
                         ]
                     }
-                """
-                )]
+                """)]
             )]
         ),
-        ApiResponse(responseCode = "400", description = "Invalid input"),
-        ApiResponse(responseCode = "404", description = "Tournament or player not found")
+        ApiResponse(responseCode = "400", description = "Invalid input."),
+        ApiResponse(responseCode = "404", description = "Tournament or player not found.")
     ])
     @PostMapping("/{tournamentId}/player/{playerId}")
     fun addPlayer(
-        @Parameter(
-            description = "ID of the tournament",
-            example = "1",
-            required = true
-        )
         @PathVariable tournamentId: Long,
-        @Parameter(
-            description = "ID of the player to add",
-            example = "1",
-            required = true
-        )
         @PathVariable playerId: Long
     ): TournamentResponse {
         val tournament = tournamentService.addPlayer(tournamentId, playerId)
@@ -122,17 +107,16 @@ class TournamentController(
     }
 
     @Operation(
-        summary = "Remove player from tournament",
-        description = "Removes a player from the specified tournament"
+        summary = "Remove a player from a tournament",
+        description = "Disassociates a player from a specified tournament."
     )
     @ApiResponses(value = [
         ApiResponse(
             responseCode = "200",
-            description = "Player removed successfully",
+            description = "Player removed successfully.",
             content = [Content(
                 mediaType = "application/json",
-                examples = [ExampleObject(
-                    value = """
+                examples = [ExampleObject(value = """
                     {
                         "id": 1,
                         "name": "Spring Challenge",
@@ -140,26 +124,15 @@ class TournamentController(
                         "isFinished": false,
                         "players": []
                     }
-                """
-                )]
+                """)]
             )]
         ),
-        ApiResponse(responseCode = "400", description = "Invalid input"),
-        ApiResponse(responseCode = "404", description = "Tournament or player not found")
+        ApiResponse(responseCode = "400", description = "Invalid input."),
+        ApiResponse(responseCode = "404", description = "Tournament or player not found.")
     ])
     @DeleteMapping("/{tournamentId}/player/{playerId}")
     fun removePlayer(
-        @Parameter(
-            description = "ID of the tournament",
-            example = "1",
-            required = true
-        )
         @PathVariable tournamentId: Long,
-        @Parameter(
-            description = "ID of the player to remove",
-            example = "1",
-            required = true
-        )
         @PathVariable playerId: Long
     ): TournamentResponse {
         val tournament = tournamentService.removePlayer(tournamentId, playerId)
@@ -167,17 +140,16 @@ class TournamentController(
     }
 
     @Operation(
-        summary = "Finish tournament",
-        description = "Marks the specified tournament as finished"
+        summary = "Finish a tournament",
+        description = "Marks the specified tournament as finished."
     )
     @ApiResponses(value = [
         ApiResponse(
             responseCode = "200",
-            description = "Tournament finished successfully",
+            description = "Tournament finished successfully.",
             content = [Content(
                 mediaType = "application/json",
-                examples = [ExampleObject(
-                    value = """
+                examples = [ExampleObject(value = """
                     {
                         "id": 1,
                         "name": "Spring Challenge",
@@ -192,20 +164,14 @@ class TournamentController(
                             }
                         ]
                     }
-                """
-                )]
+                """)]
             )]
         ),
-        ApiResponse(responseCode = "400", description = "Invalid input"),
-        ApiResponse(responseCode = "404", description = "Tournament not found")
+        ApiResponse(responseCode = "400", description = "Invalid input."),
+        ApiResponse(responseCode = "404", description = "Tournament not found.")
     ])
     @PostMapping("/{tournamentId}/finish")
     fun finishTournament(
-        @Parameter(
-            description = "ID of the tournament to finish",
-            example = "1",
-            required = true
-        )
         @PathVariable tournamentId: Long
     ): TournamentResponse {
         val tournament = tournamentService.finishTournament(tournamentId)
@@ -213,17 +179,16 @@ class TournamentController(
     }
 
     @Operation(
-        summary = "List tournament players",
-        description = "Returns a list of all players registered in the specified tournament"
+        summary = "List players in a tournament",
+        description = "Fetches a list of all players in a specified tournament."
     )
     @ApiResponses(value = [
         ApiResponse(
             responseCode = "200",
-            description = "Players listed successfully",
+            description = "Players retrieved successfully.",
             content = [Content(
                 mediaType = "application/json",
-                examples = [ExampleObject(
-                    value = """
+                examples = [ExampleObject(value = """
                     [
                         {
                             "id": 1,
@@ -238,20 +203,14 @@ class TournamentController(
                             "updatedAt": "2023-04-02T11:00:00"
                         }
                     ]
-                """
-                )]
+                """)]
             )]
         ),
-        ApiResponse(responseCode = "400", description = "Invalid input"),
-        ApiResponse(responseCode = "404", description = "Tournament not found")
+        ApiResponse(responseCode = "400", description = "Invalid input."),
+        ApiResponse(responseCode = "404", description = "Tournament not found.")
     ])
     @GetMapping("/{tournamentId}/player")
     fun listPlayers(
-        @Parameter(
-            description = "ID of the tournament",
-            example = "1",
-            required = true
-        )
         @PathVariable tournamentId: Long
     ): List<PlayerResponse> {
         return tournamentService.listPlayers(tournamentId)

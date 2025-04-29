@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
-@Tag(name = "Challenger", description = "Operations related to challengers management")
+@Tag(name = "Challenge", description = "Endpoints for executing and managing challenges")
 @RestController
 @RequestMapping("/challenge")
 class ChallengeController(
@@ -23,7 +23,7 @@ class ChallengeController(
 
     @Operation(
         summary = "Execute Fibonacci challenge",
-        description = "Calculates the nth number in the Fibonacci sequence"
+        description = "Calculate the nth Fibonacci number for the given input."
     )
     @ApiResponses(value = [
         ApiResponse(
@@ -40,18 +40,18 @@ class ChallengeController(
                         "result": 55,
                         "executionId": 1
                     }
-                """
+                    """
                 )]
             )]
         ),
-        ApiResponse(responseCode = "400", description = "Invalid input"),
+        ApiResponse(responseCode = "400", description = "Invalid input provided"),
         ApiResponse(responseCode = "404", description = "Player not found")
     ])
     @PostMapping("/fibonacci")
     @ResponseStatus(HttpStatus.CREATED)
     fun executeFibonacci(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Fibonacci challenge request",
+            description = "Fibonacci challenge request details",
             content = [Content(
                 mediaType = "application/json",
                 examples = [ExampleObject(value = """
@@ -59,14 +59,11 @@ class ChallengeController(
                         "playerId": 1,
                         "number": 10
                     }
-                """)]
+                    """)]
             )]
         )
-        @Parameter(
-            description = "Optional tournament ID to associate with the challenge",
-            example = "1"
-        )
         @RequestBody request: FibonacciChallengeRequest,
+        @Parameter(description = "Optional ID of the tournament", example = "1")
         @RequestParam(required = false) tournamentId: Long?
     ): ChallengeResponse {
         val result = challengeService.executeFibonacciChallenge(
@@ -79,7 +76,7 @@ class ChallengeController(
 
     @Operation(
         summary = "Execute Palindrome challenge",
-        description = "Validates if a string is a palindrome (ignores case, spaces and special characters)"
+        description = "Check if the provided string is a palindrome (case-insensitive, ignoring spaces and special characters)."
     )
     @ApiResponses(value = [
         ApiResponse(
@@ -87,7 +84,8 @@ class ChallengeController(
             description = "Challenge executed successfully",
             content = [Content(
                 mediaType = "application/json",
-                examples = [ExampleObject(value = """
+                examples = [ExampleObject(
+                    value = """
                     {
                         "challengeName": "Palindrome",
                         "success": true,
@@ -95,17 +93,18 @@ class ChallengeController(
                         "result": true,
                         "executionId": 2
                     }
-                """)]
+                    """
+                )]
             )]
         ),
-        ApiResponse(responseCode = "400", description = "Invalid input"),
+        ApiResponse(responseCode = "400", description = "Invalid input provided"),
         ApiResponse(responseCode = "404", description = "Player not found")
     ])
     @PostMapping("/palindrome")
     @ResponseStatus(HttpStatus.CREATED)
     fun executePalindrome(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Palindrome challenge request",
+            description = "Palindrome challenge request details",
             content = [Content(
                 mediaType = "application/json",
                 examples = [ExampleObject(value = """
@@ -113,14 +112,11 @@ class ChallengeController(
                         "playerId": 1,
                         "input": "A man a plan a canal Panama"
                     }
-                """)]
+                    """)]
             )]
         )
-        @Parameter(
-            description = "Optional tournament ID to associate with the challenge",
-            example = "1"
-        )
         @RequestBody request: PalindromeChallengeRequest,
+        @Parameter(description = "Optional ID of the tournament", example = "1")
         @RequestParam(required = false) tournamentId: Long?
     ): ChallengeResponse {
         val result = challengeService.executePalindromeChallenge(
@@ -133,7 +129,7 @@ class ChallengeController(
 
     @Operation(
         summary = "Execute Sorting challenge",
-        description = "Sorts an array of numbers using a custom merge sort algorithm"
+        description = "Sort an array of integers using a merge sort algorithm."
     )
     @ApiResponses(value = [
         ApiResponse(
@@ -141,7 +137,8 @@ class ChallengeController(
             description = "Challenge executed successfully",
             content = [Content(
                 mediaType = "application/json",
-                examples = [ExampleObject(value = """
+                examples = [ExampleObject(
+                    value = """
                     {
                         "challengeName": "Sorting",
                         "success": true,
@@ -149,17 +146,18 @@ class ChallengeController(
                         "result": [1, 2, 3, 4, 5],
                         "executionId": 3
                     }
-                """)]
+                    """
+                )]
             )]
         ),
-        ApiResponse(responseCode = "400", description = "Invalid input"),
+        ApiResponse(responseCode = "400", description = "Invalid input provided"),
         ApiResponse(responseCode = "404", description = "Player not found")
     ])
     @PostMapping("/sorting")
     @ResponseStatus(HttpStatus.CREATED)
     fun executeSorting(
         @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Sorting challenge request",
+            description = "Sorting challenge request details",
             content = [Content(
                 mediaType = "application/json",
                 examples = [ExampleObject(value = """
@@ -167,14 +165,11 @@ class ChallengeController(
                         "playerId": 1,
                         "numbers": [5, 3, 1, 4, 2]
                     }
-                """)]
+                    """)]
             )]
         )
-        @Parameter(
-            description = "Optional tournament ID to associate with the challenge",
-            example = "1"
-        )
         @RequestBody request: SortingChallengeRequest,
+        @Parameter(description = "Optional ID of the tournament", example = "1")
         @RequestParam(required = false) tournamentId: Long?
     ): ChallengeResponse {
         val result = challengeService.executeSortingChallenge(
@@ -184,5 +179,4 @@ class ChallengeController(
         )
         return ChallengeMapper.toResponse(result)
     }
-
 }

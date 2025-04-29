@@ -23,13 +23,13 @@ class RankingController(
 ) {
 
     @Operation(
-        summary = "Get global rankings",
-        description = "Retrieves all players ordered by their total score (descending)"
+        summary = "Retrieve global rankings",
+        description = "Fetches all players ranked by their total scores in descending order."
     )
     @ApiResponses(value = [
         ApiResponse(
             responseCode = "200",
-            description = "Global rankings retrieved",
+            description = "Global rankings successfully retrieved.",
             content = [Content(
                 mediaType = "application/json",
                 array = ArraySchema(schema = Schema(implementation = RankingResponse::class)),
@@ -46,47 +46,47 @@ class RankingController(
                         "tournamentId": null
                     }
                 ]
-            """)]
+                """)]
             )]
         ),
-        ApiResponse(responseCode = "500", description = "An unexpected error occurred")
+        ApiResponse(responseCode = "500", description = "Unexpected error occurred.")
     ])
     @GetMapping("/global")
     fun getGlobalRankings(): List<RankingResponse> = rankingService.getGlobalRankings().map { RankingMapper.toResponse(it) }
 
     @Operation(
-        summary = "Get tournament rankings",
-        description = "Retrieves players' scores for a specific tournament (ordered descending)"
+        summary = "Retrieve tournament rankings",
+        description = "Fetches rankings of players for a specific tournament, ordered by their scores in descending order."
     )
     @ApiResponses(value = [
         ApiResponse(
             responseCode = "200",
-            description = "Tournament rankings retrieved",
+            description = "Tournament rankings successfully retrieved.",
             content = [Content(
                 mediaType = "application/json",
                 array = ArraySchema(schema = Schema(implementation = RankingResponse::class)),
                 examples = [ExampleObject(value = """
-                    [
-                        {
-                            "playerId": 3,
-                            "totalScore": 200,
-                            "tournamentId": 1
-                        },
-                        {
-                            "playerId": 1,
-                            "totalScore": 180,
-                            "tournamentId": 1
-                        }
-                    ]
+                [
+                    {
+                        "playerId": 3,
+                        "totalScore": 200,
+                        "tournamentId": 1
+                    },
+                    {
+                        "playerId": 1,
+                        "totalScore": 180,
+                        "tournamentId": 1
+                    }
+                ]
                 """)]
             )]
         ),
-        ApiResponse(responseCode = "404", description = "Tournament not found")
+        ApiResponse(responseCode = "404", description = "Tournament not found.")
     ])
     @GetMapping("/tournament/{tournamentId}")
     fun getTournamentRankings(
         @Parameter(
-            description = "ID of the tournament",
+            description = "ID of the tournament whose rankings should be retrieved.",
             example = "1",
             required = true
         )
@@ -94,36 +94,34 @@ class RankingController(
     ): List<RankingResponse> = rankingService.getTournamentRankings(tournamentId).map { RankingMapper.toResponse(it) }
 
     @Operation(
-        summary = "Get player ranking summary",
-        description = "Retrieves a player's global score and all tournament scores"
+        summary = "Retrieve player's ranking summary",
+        description = "Fetches the player's global score along with their scores in individual tournaments."
     )
     @ApiResponses(value = [
         ApiResponse(
             responseCode = "200",
-            description = "Player ranking data found",
+            description = "Player ranking data successfully retrieved.",
             content = [Content(
                 mediaType = "application/json",
                 schema = Schema(implementation = PlayerRankingSummaryResponse::class),
-                examples = [ExampleObject(
-                    value = """
-                    {
-                        "playerId": 1,
-                        "globalScore": 330,
-                        "tournamentScores": {
-                            "1": 180,
-                            "2": 150
-                        }
+                examples = [ExampleObject(value = """
+                {
+                    "playerId": 1,
+                    "globalScore": 330,
+                    "tournamentScores": {
+                        "1": 180,
+                        "2": 150
                     }
-                """
-                )]
+                }
+                """)]
             )]
         ),
-        ApiResponse(responseCode = "404", description = "Player not found")
+        ApiResponse(responseCode = "404", description = "Player not found.")
     ])
     @GetMapping("/player/{playerId}")
     fun getPlayerRanking(
         @Parameter(
-            description = "ID of the player",
+            description = "ID of the player whose ranking data should be retrieved.",
             example = "1",
             required = true
         )
@@ -137,5 +135,4 @@ class RankingController(
             tournamentScores = tournamentRankings.associate { it.tournamentId!! to it.totalScore }
         )
     }
-
 }
