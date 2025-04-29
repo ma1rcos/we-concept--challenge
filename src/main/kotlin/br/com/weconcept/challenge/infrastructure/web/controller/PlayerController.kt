@@ -3,6 +3,7 @@ package br.com.weconcept.challenge.infrastructure.web.controller
 import br.com.weconcept.challenge.application.service.PlayerService
 import br.com.weconcept.challenge.infrastructure.web.dto.request.CreatePlayerRequest
 import br.com.weconcept.challenge.infrastructure.web.dto.request.UpdatePlayerRequest
+import br.com.weconcept.challenge.infrastructure.web.dto.response.ErrorResponse
 import br.com.weconcept.challenge.infrastructure.web.dto.response.PlayerResponse
 import br.com.weconcept.challenge.infrastructure.web.mapper.PlayerMapper
 import io.swagger.v3.oas.annotations.Operation
@@ -14,8 +15,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 
 @Tag(name = "Player", description = "Operations related to players management")
 @RestController
@@ -34,7 +37,6 @@ class PlayerController(
             description = "Player created successfully.",
             content = [Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = PlayerResponse::class),
                 examples = [ExampleObject(value = """
                 {
                     "id": 1,
@@ -45,27 +47,45 @@ class PlayerController(
                 """)]
             )]
         ),
-        ApiResponse(responseCode = "400", description = "Invalid input data.")
-    ])
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    fun create(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Details of the player to create.",
+        ApiResponse(
+            responseCode = "400",
+            description = "Invalid input data or player name already exists.",
             content = [Content(
                 mediaType = "application/json",
                 examples = [ExampleObject(value = """
                 {
-                    "name": "John Doe"
+                    "message": "Já existe um jogador com este nome",
+                    "status": 400,
+                    "error": "Bad Request",
+                    "timestamp": "2023-05-15T12:00:00"
                 }
                 """)]
             )]
         )
+    ])
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    fun create(
         @RequestBody request: CreatePlayerRequest
-    ): PlayerResponse {
-        val player = PlayerMapper.toDomain(request)
-        val createdPlayer = playerService.create(player)
-        return PlayerMapper.toResponse(createdPlayer)
+    ): ResponseEntity<Any> {
+        return try {
+            val player = PlayerMapper.toDomain(request)
+            val createdPlayer = playerService.create(player)
+            ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(PlayerMapper.toResponse(createdPlayer))
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity
+                .badRequest()
+                .body(
+                    ErrorResponse(
+                        message = e.message ?: "Nome do jogador já existe",
+                        status = HttpStatus.BAD_REQUEST.value(),
+                        error = HttpStatus.BAD_REQUEST.reasonPhrase,
+                        timestamp = LocalDateTime.now()
+                    )
+                )
+        }
     }
 
     @Operation(
@@ -131,7 +151,6 @@ class PlayerController(
             description = "Player details updated successfully.",
             content = [Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = PlayerResponse::class),
                 examples = [ExampleObject(value = """
                 {
                     "id": 1,
@@ -142,30 +161,43 @@ class PlayerController(
                 """)]
             )]
         ),
-        ApiResponse(responseCode = "400", description = "Invalid input data."),
-        ApiResponse(responseCode = "404", description = "Player not found.")
-    ])
-    @PutMapping("/{id}")
-    fun update(
-        @Parameter(description = "Unique ID of the player to update.", example = "1")
-        @PathVariable id: Long,
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Updated player details.",
+        ApiResponse(
+            responseCode = "400",
+            description = "Invalid input data or player name already exists.",
             content = [Content(
                 mediaType = "application/json",
                 examples = [ExampleObject(value = """
                 {
-                    "name": "Updated Name"
+                    "message": "Já existe um jogador com este nome",
+                    "status": 400,
+                    "error": "Bad Request",
+                    "timestamp": "2023-05-15T12:00:00"
                 }
                 """)]
             )]
-        )
+        ),
+        ApiResponse(responseCode = "404", description = "Player not found.")
+    ])
+    @PutMapping("/{id}")
+    fun update(
+        @PathVariable id: Long,
         @RequestBody request: UpdatePlayerRequest
-    ): PlayerResponse {
-        val existingPlayer = playerService.getById(id) ?: throw IllegalArgumentException("Player not found.")
-        val updatedPlayer = existingPlayer.copy(name = request.name)
-        val result = playerService.update(updatedPlayer)
-        return PlayerMapper.toResponse(result)
+    ): ResponseEntity<Any> {
+        return try {
+            val existingPlayer = playerService.getById(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+            val updatedPlayer = existingPlayer.copy(name = request.name)
+            val result = playerService.update(updatedPlayer)
+            ResponseEntity.ok(PlayerMapper.toResponse(result))
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity
+                .badRequest()
+                .body(ErrorResponse(
+                    message = e.message ?: "Nome do jogador já existe",
+                    status = HttpStatus.BAD_REQUEST.value(),
+                    error = HttpStatus.BAD_REQUEST.reasonPhrase,
+                    timestamp = LocalDateTime.now()
+                ))
+        }
     }
 
     @Operation(
@@ -182,4 +214,5 @@ class PlayerController(
         @Parameter(description = "Unique ID of the player to delete.", example = "1")
         @PathVariable id: Long
     ) = playerService.deleteById(id)
+
 }
