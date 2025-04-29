@@ -12,26 +12,45 @@ class RankingService(
 ) {
 
     fun getGlobalRankings(): List<Ranking> = rankingRepositoryPort.findAllByTournamentIsNullOrderByTotalScoreDesc()
+    
     fun getTournamentRankings(tournamentId: Long): List<Ranking> = rankingRepositoryPort.findAllByTournamentOrderByTotalScoreDesc(tournamentId)
+    
     fun getGlobalRankingForPlayer(playerId: Long): Ranking? = rankingRepositoryPort.findByPlayerAndTournamentIsNull(playerId)
+    
     fun getTournamentRankingsForPlayer(playerId: Long): List<Ranking> = rankingRepositoryPort.findAllByPlayer(playerId).filter { it.tournamentId != null }
 
     @Transactional
-    fun updatePlayerScore(playerId: Long, scoreToAdd: Int, tournamentId: Long? = null) {
+    fun updatePlayerScore(
+        playerId: Long, 
+        scoreToAdd: Int, 
+        tournamentId: Long? = null
+    ) {
         updateGlobalRanking(playerId, scoreToAdd)
         tournamentId?.let { updateTournamentRanking(playerId, scoreToAdd, it) }
     }
 
-    private fun updateGlobalRanking(playerId: Long, scoreToAdd: Int) {
-        val globalRanking = rankingRepositoryPort.findByPlayerAndTournamentIsNull(playerId)
-            ?: Ranking(playerId = playerId, totalScore = 0)
+    private fun updateGlobalRanking(
+        playerId: Long, 
+        scoreToAdd: Int
+    ) {
+        val globalRanking = rankingRepositoryPort.findByPlayerAndTournamentIsNull(playerId)?: Ranking(
+            playerId = playerId, 
+            totalScore = 0
+        )
         globalRanking.totalScore += scoreToAdd
         rankingRepositoryPort.save(globalRanking)
     }
 
-    private fun updateTournamentRanking(playerId: Long, scoreToAdd: Int, tournamentId: Long) {
-        val tournamentRanking = rankingRepositoryPort.findByPlayerAndTournament(playerId, tournamentId)
-            ?: Ranking(playerId = playerId, tournamentId = tournamentId, totalScore = 0)
+    private fun updateTournamentRanking(
+        playerId: Long, 
+        scoreToAdd: Int, 
+        tournamentId: Long
+    ) {
+        val tournamentRanking = rankingRepositoryPort.findByPlayerAndTournament(playerId, tournamentId)?: Ranking(
+            playerId = playerId, 
+            tournamentId = tournamentId, 
+            totalScore = 0
+        )
         tournamentRanking.totalScore += scoreToAdd
         rankingRepositoryPort.save(tournamentRanking)
     }

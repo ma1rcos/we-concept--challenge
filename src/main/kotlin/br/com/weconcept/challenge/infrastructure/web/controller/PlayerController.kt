@@ -86,10 +86,8 @@ class PlayerController(
     fun getById(
         @Parameter(description = "ID of the player to retrieve", example = "1")
         @PathVariable id: Long
-    ): PlayerResponse {
-        return playerService.getById(id)?.let { PlayerMapper.toResponse(it) }
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-    }
+    ): PlayerResponse = playerService.getById(id)?.let { PlayerMapper.toResponse(it) }?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    
 
     @Operation(
         summary = "Get player by name",
@@ -122,10 +120,8 @@ class PlayerController(
             required = true
         )
         @RequestParam name: String
-    ): PlayerResponse {
-        return playerService.getByName(name)?.let { PlayerMapper.toResponse(it) }
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-    }
+    ): PlayerResponse = playerService.getByName(name)?.let { PlayerMapper.toResponse(it) } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    
 
     @Operation(
         summary = "Update player information",
@@ -187,8 +183,6 @@ class PlayerController(
     fun deleteById(
         @Parameter(description = "ID of the player to delete", example = "1")
         @PathVariable id: Long
-    ) {
-        playerService.deleteById(id)
-    }
+    ) = playerService.deleteById(id)
 
 }

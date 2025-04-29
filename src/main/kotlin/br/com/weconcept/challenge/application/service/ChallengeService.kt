@@ -21,9 +21,12 @@ class ChallengeService(
 ) {
 
     @Transactional
-    fun executeFibonacciChallenge(playerId: Long, number: Int, tournamentId: Long? = null): ChallengeResult {
-        val player = playerRepositoryPort.findById(playerId)
-            ?: throw IllegalArgumentException("Player not found")
+    fun executeFibonacciChallenge(
+        playerId: Long, 
+        number: Int, 
+        tournamentId: Long? = null
+    ): ChallengeResult {
+        val player = playerRepositoryPort.findById(playerId) ?: throw IllegalArgumentException("Player not found")
         val tournament = tournamentId?.let { tournamentRepositoryPort.findById(it) }
         val result = calculateFibonacci(number)
         val challenge = Challenge.FIBONACCI
@@ -38,9 +41,12 @@ class ChallengeService(
     }
 
     @Transactional
-    fun executePalindromeChallenge(playerId: Long, input: String, tournamentId: Long? = null): ChallengeResult {
-        val player = playerRepositoryPort.findById(playerId)
-            ?: throw IllegalArgumentException("Player not found")
+    fun executePalindromeChallenge(
+        playerId: Long, 
+        input: String, 
+        tournamentId: Long? = null
+    ): ChallengeResult {
+        val player = playerRepositoryPort.findById(playerId) ?: throw IllegalArgumentException("Player not found")
         val tournament = tournamentId?.let { tournamentRepositoryPort.findById(it) }
         val result = isPalindrome(input)
         val challenge = Challenge.PALINDROME
@@ -55,9 +61,12 @@ class ChallengeService(
     }
 
     @Transactional
-    fun executeSortingChallenge(playerId: Long, numbers: List<Int>, tournamentId: Long? = null): ChallengeResult {
-        val player = playerRepositoryPort.findById(playerId)
-            ?: throw IllegalArgumentException("Player not found")
+    fun executeSortingChallenge(
+        playerId: Long, 
+        numbers: List<Int>, 
+        tournamentId: Long? = null
+    ): ChallengeResult {
+        val player = playerRepositoryPort.findById(playerId) ?: throw IllegalArgumentException("Player not found")
         val tournament = tournamentId?.let { tournamentRepositoryPort.findById(it) }
         val result = customSort(numbers)
         val challenge = Challenge.SORTING

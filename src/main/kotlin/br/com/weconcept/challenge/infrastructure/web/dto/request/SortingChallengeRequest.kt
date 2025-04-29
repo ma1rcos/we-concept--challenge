@@ -10,7 +10,6 @@ data class SortingChallengeRequest(
         required = true
     )
     val playerId: Long,
-
     @Schema(
         description = "Array of numbers to be sorted",
         example = "[5, 3, 1, 4, 2]",

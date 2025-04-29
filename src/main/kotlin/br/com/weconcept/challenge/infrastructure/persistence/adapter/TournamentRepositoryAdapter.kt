@@ -10,8 +10,11 @@ import org.springframework.stereotype.Component
 class TournamentRepositoryAdapter(
     private val tournamentJpaRepository: TournamentJpaRepository
 ) : TournamentRepositoryPort {
+
     override fun save(tournament: Tournament): Tournament = tournamentJpaRepository.save(tournament)
+    
     override fun findById(id: Long): Tournament? = tournamentJpaRepository.findById(id).orElse(null)
+    
     override fun addPlayer(tournamentId: Long, player: Player): Tournament {
         val tournament = tournamentJpaRepository.findById(tournamentId)
             .orElseThrow { IllegalArgumentException("Tournament not found") }
@@ -21,6 +24,7 @@ class TournamentRepositoryAdapter(
         tournament.players.add(player)
         return tournamentJpaRepository.save(tournament)
     }
+    
     override fun removePlayer(tournamentId: Long, playerId: Long): Tournament {
         val tournament = tournamentJpaRepository.findById(tournamentId)
             .orElseThrow { IllegalArgumentException("Tournament not found") }
@@ -32,15 +36,15 @@ class TournamentRepositoryAdapter(
         tournament.players.remove(player)
         return tournamentJpaRepository.save(tournament)
     }
+    
     override fun finishTournament(tournamentId: Long): Tournament {
         val tournament = tournamentJpaRepository.findById(tournamentId)
             .orElseThrow { IllegalArgumentException("Tournament not found") }
-        
         if (tournament.isFinished) {
             throw IllegalStateException("Tournament already finished")
         }
-        
         tournament.isFinished = true
         return tournamentJpaRepository.save(tournament)
     }
+
 }

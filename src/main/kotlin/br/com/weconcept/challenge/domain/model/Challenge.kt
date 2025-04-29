@@ -11,7 +11,7 @@ data class Challenge(
     val weight: Int,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
-) {
+    ) {
     constructor() : this(
         0,
         "",

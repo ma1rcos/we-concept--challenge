@@ -11,17 +11,20 @@ class TournamentService(
     private val tournamentRepository: TournamentRepositoryPort,
     private val playerRepository: PlayerRepositoryPort
 ) {
+    
     fun create(tournament: Tournament): Tournament = tournamentRepository.save(tournament)
+    
     fun findById(id: Long): Tournament? = tournamentRepository.findById(id)
+    
     fun removePlayer(tournamentId: Long, playerId: Long): Tournament = tournamentRepository.removePlayer(tournamentId, playerId)
+    
     fun finishTournament(tournamentId: Long): Tournament = tournamentRepository.finishTournament(tournamentId)
+
+    fun listPlayers(tournamentId: Long): Set<Player> = tournamentRepository.findById(tournamentId)?.players ?: throw IllegalArgumentException("Tournament not found")
+    
     fun addPlayer(tournamentId: Long, playerId: Long): Tournament {
-        val player = playerRepository.findById(playerId) 
-            ?: throw IllegalArgumentException("Player not found")
+        val player = playerRepository.findById(playerId) ?: throw IllegalArgumentException("Player not found")
         return tournamentRepository.addPlayer(tournamentId, player)
     }
-    fun listPlayers(tournamentId: Long): Set<Player> {
-        return tournamentRepository.findById(tournamentId)?.players 
-            ?: throw IllegalArgumentException("Tournament not found")
-    }
+
 }

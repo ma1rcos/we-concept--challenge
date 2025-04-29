@@ -7,12 +7,14 @@ import br.com.weconcept.challenge.infrastructure.web.dto.response.PlayerResponse
 import br.com.weconcept.challenge.infrastructure.web.dto.response.TournamentResponse
 
 object TournamentMapper {
+
     fun toDomain(request: CreateTournamentRequest): Tournament {
         return Tournament(
             name = request.name,
             date = request.date
         )
     }
+    
     fun toResponse(tournament: Tournament): TournamentResponse {
         return TournamentResponse(
             id = tournament.id,
@@ -29,4 +31,5 @@ object TournamentMapper {
             }
         )
     }
+    
 }
