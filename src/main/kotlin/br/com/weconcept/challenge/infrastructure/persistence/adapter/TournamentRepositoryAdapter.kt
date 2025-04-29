@@ -14,6 +14,8 @@ class TournamentRepositoryAdapter(
     override fun save(tournament: Tournament): Tournament = tournamentJpaRepository.save(tournament)
     
     override fun findById(id: Long): Tournament? = tournamentJpaRepository.findById(id).orElse(null)
+
+    override fun existsByName(name: String): Boolean = tournamentJpaRepository.existsByName(name)
     
     override fun addPlayer(tournamentId: Long, player: Player): Tournament {
         val tournament = tournamentJpaRepository.findById(tournamentId)

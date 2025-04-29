@@ -2,6 +2,7 @@ package br.com.weconcept.challenge.infrastructure.web.controller
 
 import br.com.weconcept.challenge.application.service.TournamentService
 import br.com.weconcept.challenge.infrastructure.web.dto.request.CreateTournamentRequest
+import br.com.weconcept.challenge.infrastructure.web.dto.response.ErrorResponse
 import br.com.weconcept.challenge.infrastructure.web.dto.response.PlayerResponse
 import br.com.weconcept.challenge.infrastructure.web.dto.response.TournamentResponse
 import br.com.weconcept.challenge.infrastructure.web.mapper.TournamentMapper
@@ -12,7 +13,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 
 @Tag(name = "Tournament", description = "Operations for managing tournaments.")
 @RestController
@@ -32,38 +35,53 @@ class TournamentController(
             content = [Content(
                 mediaType = "application/json",
                 examples = [ExampleObject(value = """
-                    {
-                        "id": 1,
-                        "name": "Spring Challenge",
-                        "date": "2023-05-15",
-                        "isFinished": false,
-                        "players": []
-                    }
-                """)]
+                {
+                    "id": 1,
+                    "name": "Spring Challenge",
+                    "date": "2023-05-15",
+                    "isFinished": false,
+                    "players": []
+                }
+            """)]
             )]
         ),
-        ApiResponse(responseCode = "400", description = "Invalid input provided.")
-    ])
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    fun create(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Details of the tournament to be created.",
+        ApiResponse(
+            responseCode = "400",
+            description = "Invalid input or tournament name already exists.",
             content = [Content(
                 mediaType = "application/json",
                 examples = [ExampleObject(value = """
-                    {
-                        "name": "Spring Challenge",
-                        "date": "2023-05-15"
-                    }
-                """)]
+                {
+                    "message": "Já existe um torneio com este nome",
+                    "status": 400,
+                    "error": "Bad Request",
+                    "timestamp": "2023-05-15T12:00:00"
+                }
+            """)]
             )]
         )
-        @RequestBody request: CreateTournamentRequest
-    ): TournamentResponse {
-        val tournament = TournamentMapper.toDomain(request)
-        val createdTournament = tournamentService.create(tournament)
-        return TournamentMapper.toResponse(createdTournament)
+    ])
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    fun create(@RequestBody request: CreateTournamentRequest): ResponseEntity<Any> {
+        return try {
+            val tournament = TournamentMapper.toDomain(request)
+            val createdTournament = tournamentService.create(tournament)
+            ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(TournamentMapper.toResponse(createdTournament))
+        } catch (e: IllegalArgumentException) {
+            ResponseEntity
+                .badRequest()
+                .body(
+                    ErrorResponse(
+                        message = e.message ?: "Nome do torneio já existe",
+                        status = HttpStatus.BAD_REQUEST.value(),
+                        error = HttpStatus.BAD_REQUEST.reasonPhrase,
+                        timestamp = LocalDateTime.now()
+                    )
+                )
+        }
     }
 
     @Operation(

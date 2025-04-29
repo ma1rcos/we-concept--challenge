@@ -15,4 +15,6 @@ interface TournamentRepositoryPort {
 
     fun finishTournament(tournamentId: Long): Tournament
 
+    fun existsByName(name: String): Boolean
+
 }

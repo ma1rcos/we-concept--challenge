@@ -12,7 +12,12 @@ class TournamentService(
     private val playerRepository: PlayerRepositoryPort
 ) {
     
-    fun create(tournament: Tournament): Tournament = tournamentRepository.save(tournament)
+    fun create(tournament: Tournament): Tournament {
+        if (tournamentRepository.existsByName(tournament.name)) {
+            throw IllegalArgumentException("Já existe um torneio com este nome")
+        }
+        return tournamentRepository.save(tournament)
+    }
     
     fun findById(id: Long): Tournament? = tournamentRepository.findById(id)
     
