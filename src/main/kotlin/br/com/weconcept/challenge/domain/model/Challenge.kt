@@ -11,7 +11,7 @@ data class Challenge(
     val weight: Int,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
-    ) {
+) {
     constructor() : this(
         0,
         "",
@@ -19,9 +19,11 @@ data class Challenge(
         LocalDateTime.now(),
         LocalDateTime.now()
     )
+
     companion object {
         val FIBONACCI = Challenge(name = "Fibonacci", weight = 10)
         val PALINDROME = Challenge(name = "Palindrome", weight = 5)
         val SORTING = Challenge(name = "Sorting", weight = 8)
     }
+
 }
