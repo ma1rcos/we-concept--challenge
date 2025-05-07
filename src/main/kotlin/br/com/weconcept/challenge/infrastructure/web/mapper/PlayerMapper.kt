@@ -3,8 +3,10 @@ package br.com.weconcept.challenge.infrastructure.web.mapper
 import br.com.weconcept.challenge.domain.model.Player
 import br.com.weconcept.challenge.infrastructure.web.dto.request.CreatePlayerRequest
 import br.com.weconcept.challenge.infrastructure.web.dto.response.PlayerResponse
+import org.springframework.stereotype.Component
 
-object PlayerMapper {
+@Component
+class PlayerMapper {
 
     fun toDomain(request: CreatePlayerRequest): Player {
         return Player(

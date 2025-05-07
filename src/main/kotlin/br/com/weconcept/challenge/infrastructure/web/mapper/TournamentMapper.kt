@@ -5,8 +5,10 @@ import br.com.weconcept.challenge.domain.model.Tournament
 import br.com.weconcept.challenge.infrastructure.web.dto.request.CreateTournamentRequest
 import br.com.weconcept.challenge.infrastructure.web.dto.response.PlayerResponse
 import br.com.weconcept.challenge.infrastructure.web.dto.response.TournamentResponse
+import org.springframework.stereotype.Component
 
-object TournamentMapper {
+@Component
+class TournamentMapper {
 
     fun toDomain(request: CreateTournamentRequest): Tournament {
         return Tournament(
@@ -14,7 +16,7 @@ object TournamentMapper {
             date = request.date
         )
     }
-    
+
     fun toResponse(tournament: Tournament): TournamentResponse {
         return TournamentResponse(
             id = tournament.id,
@@ -31,5 +33,5 @@ object TournamentMapper {
             }
         )
     }
-    
+
 }

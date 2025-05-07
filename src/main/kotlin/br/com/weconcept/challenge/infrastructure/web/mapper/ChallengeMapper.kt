@@ -2,8 +2,10 @@ package br.com.weconcept.challenge.infrastructure.web.mapper
 
 import br.com.weconcept.challenge.domain.model.ChallengeResult
 import br.com.weconcept.challenge.infrastructure.web.dto.response.ChallengeResponse
+import org.springframework.stereotype.Component
 
-object ChallengeMapper {
+@Component
+class ChallengeMapper {
 
     fun toResponse(result: ChallengeResult): ChallengeResponse {
         return ChallengeResponse(
@@ -14,5 +16,4 @@ object ChallengeMapper {
             executionId = result.executionId
         )
     }
-
 }
