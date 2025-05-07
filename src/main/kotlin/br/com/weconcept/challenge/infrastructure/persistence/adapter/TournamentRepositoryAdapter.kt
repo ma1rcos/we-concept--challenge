@@ -11,42 +11,26 @@ class TournamentRepositoryAdapter(
     private val tournamentJpaRepository: TournamentJpaRepository
 ) : TournamentRepositoryPort {
 
-    override fun save(tournament: Tournament): Tournament = tournamentJpaRepository.save(tournament)
-    
-    override fun findById(id: Long): Tournament? = tournamentJpaRepository.findById(id).orElse(null)
+    override fun save(tournament: Tournament): Tournament =
+        tournamentJpaRepository.save(tournament)
 
-    override fun existsByName(name: String): Boolean = tournamentJpaRepository.existsByName(name)
-    
-    override fun addPlayer(tournamentId: Long, player: Player): Tournament {
-        val tournament = tournamentJpaRepository.findById(tournamentId)
-            .orElseThrow { IllegalArgumentException("Tournament not found") }
-        if (tournament.isFinished) {
-            throw IllegalStateException("Tournament already finished")
-        }
-        tournament.players.add(player)
-        return tournamentJpaRepository.save(tournament)
-    }
-    
-    override fun removePlayer(tournamentId: Long, playerId: Long): Tournament {
-        val tournament = tournamentJpaRepository.findById(tournamentId)
-            .orElseThrow { IllegalArgumentException("Tournament not found") }
-        if (tournament.isFinished) {
-            throw IllegalStateException("Tournament already finished")
-        }
-        val player = tournament.players.find { it.id == playerId }
-            ?: throw IllegalArgumentException("Player not found in tournament")
-        tournament.players.remove(player)
-        return tournamentJpaRepository.save(tournament)
-    }
-    
-    override fun finishTournament(tournamentId: Long): Tournament {
-        val tournament = tournamentJpaRepository.findById(tournamentId)
-            .orElseThrow { IllegalArgumentException("Tournament not found") }
-        if (tournament.isFinished) {
-            throw IllegalStateException("Tournament already finished")
-        }
-        tournament.isFinished = true
-        return tournamentJpaRepository.save(tournament)
-    }
+    override fun findById(id: Long): Tournament? =
+        tournamentJpaRepository.findById(id).orElse(null)
+
+    override fun existsByName(name: String): Boolean =
+        tournamentJpaRepository.existsByName(name)
+
+    override fun addPlayer(tournamentId: Long, player: Player): Tournament =
+        tournamentJpaRepository.findById(tournamentId).get().apply { players.add(player) }.let { tournamentJpaRepository.save(it) }
+
+    override fun removePlayer(tournamentId: Long, playerId: Long): Tournament =
+        tournamentJpaRepository.findById(tournamentId).get().apply {
+            players.removeIf { it.id == playerId }
+        }.let { tournamentJpaRepository.save(it) }
+
+    override fun finishTournament(tournamentId: Long): Tournament =
+        tournamentJpaRepository.findById(tournamentId).get().apply {
+            isFinished = true
+        }.let { tournamentJpaRepository.save(it) }
 
 }
