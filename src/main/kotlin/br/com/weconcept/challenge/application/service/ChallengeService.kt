@@ -1,40 +1,44 @@
 package br.com.weconcept.challenge.application.service
 
-import br.com.weconcept.challenge.application.port.ChallengeRepositoryPort
-import br.com.weconcept.challenge.application.port.PlayerRepositoryPort
-import br.com.weconcept.challenge.application.port.TournamentRepositoryPort
-import br.com.weconcept.challenge.domain.model.Challenge
-import br.com.weconcept.challenge.domain.model.ChallengeExecution
-import br.com.weconcept.challenge.domain.model.ChallengeResult
-import br.com.weconcept.challenge.domain.model.Player
-import br.com.weconcept.challenge.domain.model.Tournament
+import br.com.weconcept.challenge.application.port.*
+import br.com.weconcept.challenge.domain.constant.Message
+import br.com.weconcept.challenge.domain.exception.BadRequestException
+import br.com.weconcept.challenge.domain.exception.NotFoundException
+import br.com.weconcept.challenge.domain.model.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
 class ChallengeService(
-    private val challengeRepositoryPort: ChallengeRepositoryPort,
-    private val playerRepositoryPort: PlayerRepositoryPort,
-    private val tournamentRepositoryPort: TournamentRepositoryPort,
+    private val challengeRepository: ChallengeRepositoryPort,
+    private val playerRepository: PlayerRepositoryPort,
+    private val tournamentRepository: TournamentRepositoryPort,
     private val rankingService: RankingService
 ) {
 
+    companion object {
+        private const val MAX_INPUT_LENGTH = 1000
+    }
+
     @Transactional
     fun executeFibonacciChallenge(
-        playerId: Long, 
-        number: Int, 
+        playerId: Long,
+        number: Int,
         tournamentId: Long? = null
     ): ChallengeResult {
-        val player = playerRepositoryPort.findById(playerId) ?: throw IllegalArgumentException("Player not found")
-        val tournament = tournamentId?.let { tournamentRepositoryPort.findById(it) }
-        val result = calculateFibonacci(number)
-        val challenge = Challenge.FIBONACCI
-        return registerChallengeExecution(
+        validateInput(number >= 0, Message.FIBONACCI_NEGATIVE)
+        validateInput(number <= MAX_INPUT_LENGTH, Message.FIBONACCI_TOO_LARGE.format(MAX_INPUT_LENGTH))
+
+        val player = getPlayer(playerId)
+        val tournament = getTournamentIfPresent(tournamentId)
+        val result = computeFibonacci(number)
+
+        return logExecution(
             player = player,
-            challenge = challenge,
+            challenge = Challenge.FIBONACCI,
             success = result != null,
-            score = if (result != null) challenge.weight else 0,
+            score = if (result != null) Challenge.FIBONACCI.weight else 0,
             result = result,
             tournament = tournament
         )
@@ -42,19 +46,22 @@ class ChallengeService(
 
     @Transactional
     fun executePalindromeChallenge(
-        playerId: Long, 
-        input: String, 
+        playerId: Long,
+        input: String,
         tournamentId: Long? = null
     ): ChallengeResult {
-        val player = playerRepositoryPort.findById(playerId) ?: throw IllegalArgumentException("Player not found")
-        val tournament = tournamentId?.let { tournamentRepositoryPort.findById(it) }
-        val result = isPalindrome(input)
-        val challenge = Challenge.PALINDROME
-        return registerChallengeExecution(
+        validateInput(input.isNotBlank(), Message.PALINDROME_EMPTY)
+        validateInput(input.length <= MAX_INPUT_LENGTH, Message.INPUT_TOO_LONG.format(MAX_INPUT_LENGTH))
+
+        val player = getPlayer(playerId)
+        val tournament = getTournamentIfPresent(tournamentId)
+        val result = checkPalindrome(input)
+
+        return logExecution(
             player = player,
-            challenge = challenge,
+            challenge = Challenge.PALINDROME,
             success = true,
-            score = if (result) challenge.weight else 0,
+            score = if (result) Challenge.PALINDROME.weight else 0,
             result = result,
             tournament = tournament
         )
@@ -62,31 +69,60 @@ class ChallengeService(
 
     @Transactional
     fun executeSortingChallenge(
-        playerId: Long, 
-        numbers: List<Int>, 
+        playerId: Long,
+        numbers: List<Int>,
         tournamentId: Long? = null
     ): ChallengeResult {
-        val player = playerRepositoryPort.findById(playerId) ?: throw IllegalArgumentException("Player not found")
-        val tournament = tournamentId?.let { tournamentRepositoryPort.findById(it) }
-        val result = customSort(numbers)
-        val challenge = Challenge.SORTING
-        return registerChallengeExecution(
+        validateInput(numbers.isNotEmpty(), Message.SORTING_EMPTY)
+        validateInput(numbers.size <= MAX_INPUT_LENGTH, Message.INPUT_TOO_LARGE.format(MAX_INPUT_LENGTH))
+
+        val player = getPlayer(playerId)
+        val tournament = getTournamentIfPresent(tournamentId)
+        val result = sortNumbers(numbers)
+
+        return logExecution(
             player = player,
-            challenge = challenge,
+            challenge = Challenge.SORTING,
             success = result.isNotEmpty(),
-            score = if (result.isNotEmpty()) challenge.weight else 0,
+            score = if (result.isNotEmpty()) Challenge.SORTING.weight else 0,
             result = result,
             tournament = tournament
         )
     }
 
-    private fun registerChallengeExecution(
+    @Transactional(readOnly = true)
+    fun getPlayerExecutions(playerId: Long): List<ChallengeExecution> {
+        return challengeRepository.findExecutionsByPlayer(playerId)
+    }
+
+    @Transactional(readOnly = true)
+    fun getPlayerTournamentExecutions(playerId: Long, tournamentId: Long): List<ChallengeExecution> {
+        return challengeRepository.findExecutionsByPlayerAndTournament(playerId, tournamentId)
+    }
+
+    private fun getPlayer(playerId: Long): Player {
+        return playerRepository.findById(playerId)
+            ?: throw NotFoundException(Message.PLAYER_NOT_FOUND_ID.format(playerId))
+    }
+
+    private fun getTournamentIfPresent(tournamentId: Long?): Tournament? {
+        return tournamentId?.let {
+            tournamentRepository.findById(it)
+                ?: throw NotFoundException(Message.TOURNAMENT_NOT_FOUND.format(it))
+        }
+    }
+
+    private fun validateInput(condition: Boolean, errorMessage: String) {
+        if (!condition) throw BadRequestException(errorMessage)
+    }
+
+    private fun logExecution(
         player: Player,
         challenge: Challenge,
         success: Boolean,
         score: Int,
         result: Any?,
-        tournament: Tournament? = null
+        tournament: Tournament?
     ): ChallengeResult {
         val execution = ChallengeExecution(
             playerId = player.id,
@@ -97,10 +133,13 @@ class ChallengeService(
             tournamentId = tournament?.id,
             executedAt = LocalDateTime.now()
         )
-        val savedExecution = challengeRepositoryPort.saveExecution(execution)
+
+        val savedExecution = challengeRepository.saveExecution(execution)
+
         if (success) {
             rankingService.updatePlayerScore(player.id, score, tournament?.id)
         }
+
         return ChallengeResult(
             challengeName = challenge.name,
             success = success,
@@ -110,55 +149,28 @@ class ChallengeService(
         )
     }
 
-    private fun calculateFibonacci(n: Int): Long? {
+    private fun computeFibonacci(n: Int): Long? {
         if (n < 0) return null
         if (n == 0) return 0
         if (n == 1) return 1
+
         var a = 0L
         var b = 1L
-        var result = 0L
-        for (i in 2..n) {
-            result = a + b
+        repeat(n - 1) {
+            val sum = a + b
             a = b
-            b = result
+            b = sum
         }
-        return result
+        return b
     }
 
-    private fun isPalindrome(input: String): Boolean {
-        val cleaned = input.replace("[^a-zA-Z0-9]".toRegex(), "").lowercase()
-        return cleaned == cleaned.reversed()
+    private fun checkPalindrome(input: String): Boolean {
+        val clean = input.replace("[^a-zA-Z0-9]".toRegex(), "").lowercase()
+        return clean == clean.reversed()
     }
 
-    private fun customSort(array: List<Int>): List<Int> {
-        if (array.size <= 1) return array
-        fun merge(left: List<Int>, right: List<Int>): List<Int> {
-            var indexLeft = 0
-            var indexRight = 0
-            val newList = mutableListOf<Int>()
-            while (indexLeft < left.size && indexRight < right.size) {
-                if (left[indexLeft] <= right[indexRight]) {
-                    newList.add(left[indexLeft])
-                    indexLeft++
-                } else {
-                    newList.add(right[indexRight])
-                    indexRight++
-                }
-            }
-            while (indexLeft < left.size) {
-                newList.add(left[indexLeft])
-                indexLeft++
-            }
-            while (indexRight < right.size) {
-                newList.add(right[indexRight])
-                indexRight++
-            }
-            return newList
-        }
-        val middle = array.size / 2
-        val left = array.subList(0, middle)
-        val right = array.subList(middle, array.size)
-        return merge(customSort(left), customSort(right))
+    private fun sortNumbers(list: List<Int>): List<Int> {
+        return list.sorted()
     }
 
 }
