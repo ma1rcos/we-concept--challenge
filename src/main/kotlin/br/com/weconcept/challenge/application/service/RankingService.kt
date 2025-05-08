@@ -3,7 +3,6 @@ package br.com.weconcept.challenge.application.service
 import br.com.weconcept.challenge.application.port.RankingRepositoryPort
 import br.com.weconcept.challenge.domain.constant.Message
 import br.com.weconcept.challenge.domain.exception.BadRequestException
-import br.com.weconcept.challenge.domain.exception.NotFoundException
 import br.com.weconcept.challenge.domain.model.Ranking
 import br.com.weconcept.challenge.infrastructure.web.dto.response.PlayerRankingSummaryResponse
 import org.springframework.stereotype.Service
@@ -43,7 +42,6 @@ class RankingService(
     ) {
         require(scoreToAdd >= 0) { throw BadRequestException(Message.INVALID_SCORE_VALUE) }
         playerService.getById(playerId)
-
         updateGlobalRanking(playerId, scoreToAdd)
         tournamentId?.let { updateTournamentRanking(playerId, scoreToAdd, it) }
     }
