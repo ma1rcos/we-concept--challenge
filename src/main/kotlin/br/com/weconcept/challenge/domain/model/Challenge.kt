@@ -19,11 +19,9 @@ data class Challenge(
         LocalDateTime.now(),
         LocalDateTime.now()
     )
-
     companion object {
         val FIBONACCI = Challenge(name = "Fibonacci", weight = 10)
         val PALINDROME = Challenge(name = "Palindrome", weight = 5)
         val SORTING = Challenge(name = "Sorting", weight = 8)
     }
-
 }
