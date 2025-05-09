@@ -84,7 +84,6 @@ src/
 
 #### Implantação em Produção (PostgreSQL)
 ```bash
-docker-compose up -d
 ./gradlew build && java -jar build/libs/*.jar
 ```
 
@@ -131,26 +130,49 @@ docker-compose up -d
 
 ### Configuração via Docker
 
-```yaml
-version: '3.8'
-services:
-  app:
-    image: challenge-platform:latest
-    ports:
-      - "8080:8080"
-    depends_on:
-      - postgres
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
+#### Dockerfile para o Aplicativo
+```dockerfile
+FROM rockylinux:9.3 AS builder
 
-  postgres:
-    image: postgres:13
-    environment:
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_USER=admin
-      - POSTGRES_DB=tournament
-    ports:
-      - "5432:5432"
+RUN dnf update -y && dnf clean all
+
+RUN dnf install -y java-21-openjdk-devel && dnf clean all
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN ./gradlew build --no-daemon
+
+FROM rockylinux:9.3
+
+RUN dnf update -y && dnf clean all
+
+RUN dnf install -y java-21-openjdk && dnf clean all
+
+WORKDIR /usr/src/app
+
+COPY --from=builder /usr/src/app/build/libs/*.jar /usr/src/app/app.jar
+
+EXPOSE 8080
+
+CMD ["java", "-jar", "app.jar"]
+```
+
+#### Dockerfile para o Banco de Dados
+```dockerfile
+FROM postgres:16.8
+
+ENV POSTGRES_DB=weconcept
+ENV POSTGRES_USER=developer
+ENV POSTGRES_PASSWORD=1357924680
+ENV PGDATA=/var/lib/postgresql/data/pgdata
+
+EXPOSE 5432
+
+COPY ./init.sql /docker-entrypoint-initdb.d/
+
+RUN chmod -R 0700 /var/lib/postgresql/data && chown -R postgres:postgres /var/lib/postgresql/data
 ```
 
 ### Implantação via Script
