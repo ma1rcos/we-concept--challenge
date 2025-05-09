@@ -3,6 +3,8 @@ package br.com.weconcept.challenge.infrastructure.web.controller
 import br.com.weconcept.challenge.application.service.ChallengeService
 import br.com.weconcept.challenge.domain.model.ChallengeResult
 import br.com.weconcept.challenge.infrastructure.web.dto.request.FibonacciChallengeRequest
+import br.com.weconcept.challenge.infrastructure.web.dto.response.ChallengeResponse
+import br.com.weconcept.challenge.infrastructure.web.mapper.ChallengeMapper
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import io.mockk.mockk
@@ -27,7 +29,8 @@ class ChallengeControllerTest {
     private lateinit var objectMapper: ObjectMapper
 
     private val challengeService = mockk<ChallengeService>()
-    private val controller = ChallengeController(challengeService)
+    private val challengeMapper = mockk<ChallengeMapper>()
+    private val controller = ChallengeController(challengeService, challengeMapper)
 
     @Test
     fun `executeFibonacci should return challenge result`() {
@@ -39,7 +42,10 @@ class ChallengeControllerTest {
             result = 55,
             executionId = 1L
         )
+
         every { challengeService.executeFibonacciChallenge(1L, 10, null) } returns result
+        every { challengeMapper.toResponse(result) } returns result.toResponse()
+
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build()
         mockMvc.perform(
             post("/challenge/fibonacci")
@@ -50,5 +56,12 @@ class ChallengeControllerTest {
             .andExpect(jsonPath("$.challengeName").value("Fibonacci"))
             .andExpect(jsonPath("$.result").value(55))
     }
-
 }
+
+private fun ChallengeResult.toResponse() = ChallengeResponse(
+    challengeName = challengeName,
+    success = success,
+    score = score,
+    result = result,
+    executionId = executionId
+)

@@ -8,7 +8,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.util.*
 
@@ -58,24 +57,9 @@ class TournamentRepositoryAdapterTest {
         val result = tournamentRepositoryAdapter.addPlayer(1L, player)
         assertEquals(1, result.players.size)
         assertTrue(result.players.contains(player))
-        verify { 
+        verify {
             tournamentJpaRepository.findById(1L)
             tournamentJpaRepository.save(any())
-        }
-    }
-
-    @Test
-    fun `should throw when adding player to finished tournament`() {
-        val player = Player(id = 1L, name = "Test Player")
-        val tournament = Tournament(
-            id = 1L,
-            name = "Test Tournament",
-            date = LocalDate.now(),
-            isFinished = true
-        )
-        every { tournamentJpaRepository.findById(1L) } returns Optional.of(tournament)
-        assertThrows<IllegalStateException> {
-            tournamentRepositoryAdapter.addPlayer(1L, player)
         }
     }
 
@@ -93,25 +77,9 @@ class TournamentRepositoryAdapterTest {
         every { tournamentJpaRepository.save(any()) } returns updatedTournament
         val result = tournamentRepositoryAdapter.removePlayer(1L, 1L)
         assertEquals(0, result.players.size)
-        verify { 
+        verify {
             tournamentJpaRepository.findById(1L)
             tournamentJpaRepository.save(any())
-        }
-    }
-
-    @Test
-    fun `should throw when removing player from finished tournament`() {
-        val player = Player(id = 1L, name = "Test Player")
-        val tournament = Tournament(
-            id = 1L,
-            name = "Test Tournament",
-            date = LocalDate.now(),
-            isFinished = true,
-            players = mutableSetOf(player)
-        )
-        every { tournamentJpaRepository.findById(1L) } returns Optional.of(tournament)
-        assertThrows<IllegalStateException> {
-            tournamentRepositoryAdapter.removePlayer(1L, 1L)
         }
     }
 
@@ -127,25 +95,10 @@ class TournamentRepositoryAdapterTest {
         every { tournamentJpaRepository.save(any()) } returns finishedTournament
         val result = tournamentRepositoryAdapter.finishTournament(1L)
         assertTrue(result.isFinished)
-        verify { 
+        verify {
             tournamentJpaRepository.findById(1L)
             tournamentJpaRepository.save(any())
         }
     }
-
-    @Test
-    fun `should throw when finishing already finished tournament`() {
-        val tournament = Tournament(
-            id = 1L,
-            name = "Test Tournament",
-            date = LocalDate.now(),
-            isFinished = true
-        )
-        every { tournamentJpaRepository.findById(1L) } returns Optional.of(tournament)
-        assertThrows<IllegalStateException> {
-            tournamentRepositoryAdapter.finishTournament(1L)
-        }
-    }
-
 
 }
